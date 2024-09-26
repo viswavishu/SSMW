@@ -46,3 +46,39 @@ CREATE TABLE Sale_Details (
     FOREIGN KEY (Sale_id) REFERENCES Sales(Sale_id),
     FOREIGN KEY (Product_id, Supplier_id) REFERENCES Products_Suppliers(Product_id, Supplier_id)
 );
+
+
+CREATE TABLE ExchangedItems (
+    Exchange_Id INT IDENTITY(1,1) PRIMARY KEY,
+    Original_Product_Id INT NOT NULL,
+    Original_Supplier_Id INT NOT NULL,
+    Exchange_Date DATETIME NOT NULL,
+    Refurbishment_Cost DECIMAL(10, 2) NULL,
+    Estimated_Resale_Value DECIMAL(10, 2) NULL,
+    Actual_Resale_Value DECIMAL(10, 2) NOT NULL,
+    Profit_Or_Loss DECIMAL(10, 2) NULL,
+    Status CHAR(1) NOT NULL,
+    CONSTRAINT FK_ExchangedItems_Products_Suppliers FOREIGN KEY (Original_Product_Id, Original_Supplier_Id) 
+        REFERENCES Products_Suppliers(Product_Id, Supplier_Id)
+);
+
+ALTER TABLE ExchangedItems
+ALTER column Status VARCHAR(5)
+
+
+
+ALTER TABLE SalesDetails
+ADD CONSTRAINT FK_SalesDetails_ExchangedItems FOREIGN KEY (Exchanged_Item_Id) 
+    REFERENCES ExchangedItems(Exchange_Id);
+
+
+CREATE TABLE RepairStatus (
+    RepairStatus_id INT IDENTITY(1,1) PRIMARY KEY,
+    Exchange_id INT NOT NULL, -- Reference to the ExchangedItems table
+    Item_sent_Date DATE NOT NULL,
+    Completion_Date DATE,
+    Status VARCHAR(20) NOT NULL, -- E.g., "In Progress", "Completed", etc.
+    Remarks VARCHAR(255), -- Optional comments or remarks about the repair process
+    FOREIGN KEY (Exchange_id) REFERENCES ExchangedItems(Exchange_id) -- Link to the ExchangedItems table
+);
+
